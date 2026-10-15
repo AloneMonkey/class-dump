@@ -81,7 +81,8 @@
         [resultString appendString:formattedString];
         [resultString appendString:@";"];
         if ([typeController shouldShowIvarOffsets]) {
-            [resultString appendFormat:@"\t// %ld = 0x%lx", self.offset, self.offset];
+            if (self.offset == NSUIntegerMax) [resultString appendString:@"\t// offset initialized at runtime"];
+            else [resultString appendFormat:@"\t// %ld = 0x%lx", self.offset, self.offset];
         }
     }
 }

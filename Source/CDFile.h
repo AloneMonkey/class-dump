@@ -12,11 +12,17 @@ typedef struct {
 
 @class CDMachOFile, CDSearchPathState;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 NSString *CDImportNameForPath(NSString *path);
 NSString *CDNameForCPUType(cpu_type_t cputype, cpu_subtype_t cpusubtype);
 CDArch CDArchFromName(NSString *name);
 BOOL CDArchUses64BitABI(CDArch arch);
 BOOL CDArchUses64BitLibraries(CDArch arch);
+#ifdef __cplusplus
+}
+#endif
 
 @interface CDFile : NSObject
 

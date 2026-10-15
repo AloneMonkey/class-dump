@@ -116,7 +116,9 @@
     if (self.outputPath != nil)
         filename = [self.outputPath stringByAppendingPathComponent:filename];
 
-    [[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename atomically:YES];
+    NSError *writeError = nil;
+    if (![[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename options:NSDataWritingAtomic error:&writeError])
+        [NSException raise:NSInvalidArgumentException format:@"cannot export header %@: %@", filename, writeError.localizedDescription];
 }
 
 - (void)willVisitCategory:(CDOCCategory *)category;
@@ -154,7 +156,9 @@
     if (self.outputPath != nil)
         filename = [self.outputPath stringByAppendingPathComponent:filename];
 
-    [[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename atomically:YES];
+    NSError *writeError = nil;
+    if (![[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename options:NSDataWritingAtomic error:&writeError])
+        [NSException raise:NSInvalidArgumentException format:@"cannot export header %@: %@", filename, writeError.localizedDescription];
 }
 
 - (void)willVisitProtocol:(CDOCProtocol *)protocol;
@@ -185,7 +189,9 @@
     if (self.outputPath != nil)
         filename = [self.outputPath stringByAppendingPathComponent:filename];
 
-    [[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename atomically:YES];
+    NSError *writeError = nil;
+    if (![[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename options:NSDataWritingAtomic error:&writeError])
+        [NSException raise:NSInvalidArgumentException format:@"cannot export header %@: %@", filename, writeError.localizedDescription];
 }
 
 #pragma mark - CDTypeControllerDelegate
@@ -383,7 +389,9 @@
     if (self.outputPath != nil)
         filename = [self.outputPath stringByAppendingPathComponent:filename];
     
-    [[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename atomically:YES];
+    NSError *writeError = nil;
+    if (![[self.resultString dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filename options:NSDataWritingAtomic error:&writeError])
+        [NSException raise:NSInvalidArgumentException format:@"cannot export header %@: %@", filename, writeError.localizedDescription];
 }
 
 @end

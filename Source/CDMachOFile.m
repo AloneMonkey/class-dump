@@ -4,6 +4,7 @@
 //  Copyright (C) 1997-1998, 2000-2001, 2004-2015 Steve Nygard.
 
 #import "CDMachOFile.h"
+#import "ClassDumpModern.h"
 
 #include <mach-o/arch.h>
 #include <mach-o/loader.h>
@@ -45,6 +46,7 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
 {
     CDByteOrder _byteOrder;
     
+    NSDictionary *_mdBindings;
     NSArray *_loadCommands;
     NSArray *_dylibLoadCommands;
     NSArray *_segments;
@@ -84,7 +86,10 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
 
 - (id)initWithData:(NSData *)data filename:(NSString *)filename searchPathState:(CDSearchPathState *)searchPathState;
 {
+    NSDictionary *bindings = nil;
+    data = MDPrepareClassDumpImage(data, filename, &bindings);
     if ((self = [super initWithData:data filename:filename searchPathState:searchPathState])) {
+        _mdBindings = bindings;
         _byteOrder = CDByteOrder_LittleEndian;
         
         CDDataCursor *cursor = [[CDDataCursor alloc] initWithData:data];
@@ -279,6 +284,21 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
 
 #pragma mark -
 
+- (BOOL)mdAddressIsFileBacked:(NSUInteger)address
+{
+    CDLCSegment *segment = [self segmentContainingAddress:address];
+    return segment && address - segment.vmaddr < segment.filesize && ![segment sectionContainingAddress:address].isZeroFill;
+}
+
+- (CDSection *)mdSectionWithName:(NSString *)name
+{
+    for (CDLCSegment *segment in self.segments) {
+        CDSection *section = [segment sectionWithName:name];
+        if (section) return section;
+    }
+    return nil;
+}
+
 - (CDLCSegment *)dataConstSegment
 {
     // macho objects from iOS 9 appear to store various sections
@@ -321,35 +341,16 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
 
 - (NSString *)stringAtAddress:(NSUInteger)address;
 {
-    const void *ptr;
-
-    if (address == 0)
-        return nil;
-
-    CDLCSegment *segment = [self segmentContainingAddress:address];
-    if (segment == nil) {
-        NSLog(@"Error: Cannot find offset for address 0x%08lx in stringAtAddress:", address);
-        exit(5);
-        return nil;
-    }
-
-    if ([segment isProtected]) {
-        NSData *d2 = [segment decryptedData];
-        NSUInteger d2Offset = [segment segmentOffsetForAddress:address];
-        if (d2Offset == 0)
-            return nil;
-
-        ptr = (uint8_t *)[d2 bytes] + d2Offset;
-        return [[NSString alloc] initWithBytes:ptr length:strlen(ptr) encoding:NSASCIIStringEncoding];
-    }
-
+    if (!address) return nil;
     NSUInteger offset = [self dataOffsetForAddress:address];
-    if (offset == 0)
-        return nil;
-
-    ptr = (uint8_t *)[self.data bytes] + offset;
-
-    return [[NSString alloc] initWithBytes:ptr length:strlen(ptr) encoding:NSASCIIStringEncoding];
+    CDLCSegment *segment = [self segmentContainingAddress:address];
+    NSUInteger available = MIN(self.data.length - offset, segment.filesize - (address - segment.vmaddr));
+    const char *begin = (const char *)self.data.bytes + offset;
+    const char *end = (const char *)memchr(begin, 0, available);
+    if (!end) [NSException raise:NSInvalidArgumentException format:@"unterminated metadata string"];
+    NSString *result = [[NSString alloc] initWithBytes:begin length:end - begin encoding:NSUTF8StringEncoding];
+    if (!result) [NSException raise:NSInvalidArgumentException format:@"invalid UTF-8 metadata string"];
+    return result;
 }
 
 - (NSUInteger)dataOffsetForAddress:(NSUInteger)address;
@@ -377,7 +378,10 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
     NSLog(@"data offset:      0x%08x", offset + [segment fileOffsetForAddress:address]);
     NSLog(@"<----------");
 #endif
-    return [segment fileOffsetForAddress:address];
+    NSUInteger offset = segment.fileoff + address - segment.vmaddr;
+    if (offset >= self.data.length || ![self mdAddressIsFileBacked:address])
+        [NSException raise:NSRangeException format:@"metadata address 0x%lx outside file-backed segment %@ (offset 0x%lx, vmaddr 0x%lx, filesize 0x%lx)", address, segment.name, offset, segment.vmaddr, segment.filesize];
+    return offset;
 }
 
 - (const void *)bytes;
@@ -539,12 +543,12 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
 
 - (BOOL)hasRelocationEntryForAddress2:(NSUInteger)address;
 {
-    return [self.dyldInfo symbolNameForAddress:address] != nil;
+    return _mdBindings[@(address)] != nil || [self.dyldInfo symbolNameForAddress:address] != nil;
 }
 
 - (NSString *)externalClassNameForAddress2:(NSUInteger)address;
 {
-    NSString *str = [self.dyldInfo symbolNameForAddress:address];
+    NSString *str = _mdBindings[@(address)] ?: [self.dyldInfo symbolNameForAddress:address];
 
     if (str != nil) {
         if ([str hasPrefix:ObjCClassSymbolPrefix]) {
@@ -571,7 +575,7 @@ static NSString *CDMachOFileMagicNumberDescription(uint32_t magic)
     // 0xced: @gparker I was hoping for a flag, but that will do it, thanks.
     // 0xced: @gparker Did you mean __DATA,__objc_imageinfo instead of __DATA,__objc_info ?
     // gparker: @0xced Yes, it's __DATA,__objc_imageinfo.
-    return [[self dataConstSegment] sectionWithName:@"__objc_imageinfo"] != nil;
+    return [self mdSectionWithName:@"__objc_imageinfo"] != nil;
 }
 
 - (Class)processorClass;

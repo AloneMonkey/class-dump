@@ -68,6 +68,12 @@
     return _section.size;
 }
 
+- (BOOL)isZeroFill;
+{
+    uint32_t kind = _section.flags & SECTION_TYPE;
+    return kind == S_ZEROFILL || kind == S_GB_ZEROFILL || kind == S_THREAD_LOCAL_ZEROFILL;
+}
+
 - (BOOL)containsAddress:(NSUInteger)address;
 {
     return (address >= _section.addr) && (address < _section.addr + _section.size);

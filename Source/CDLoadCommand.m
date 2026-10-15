@@ -94,6 +94,10 @@
         case LC_SOURCE_VERSION:        targetClass = [CDLCSourceVersion class]; break;
         case LC_DYLIB_CODE_SIGN_DRS:   targetClass = [CDLCLinkeditData class]; break; // Designated Requirements
             
+        case LC_DYLD_CHAINED_FIXUPS:
+        case LC_DYLD_EXPORTS_TRIE:
+        case LC_BUILD_VERSION:
+            targetClass = [CDLCUnknown class]; break; // Parsed or safely skipped by the modern adapter.
         default:
             NSLog(@"Unknown load command: 0x%08x", val);
     };
@@ -192,6 +196,9 @@
         case LC_VERSION_MIN_IPHONEOS:  return @"LC_VERSION_MIN_IPHONEOS";
         case LC_FUNCTION_STARTS:       return @"LC_FUNCTION_STARTS";
         case LC_DYLD_ENVIRONMENT:      return @"LC_DYLD_ENVIRONMENT";
+        case LC_DYLD_CHAINED_FIXUPS: return @"LC_DYLD_CHAINED_FIXUPS";
+        case LC_DYLD_EXPORTS_TRIE: return @"LC_DYLD_EXPORTS_TRIE";
+        case LC_BUILD_VERSION: return @"LC_BUILD_VERSION";
         default:
             break;
     }

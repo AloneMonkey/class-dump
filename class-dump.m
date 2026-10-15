@@ -61,6 +61,7 @@ void print_usage(void)
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
+      @try {
         NSString *searchString;
         BOOL shouldGenerateSeparateHeaders = NO;
         BOOL shouldListArches = NO;
@@ -340,5 +341,9 @@ int main(int argc, char *argv[])
             }
         }
         exit(0); // avoid costly autorelease pool drain, we’re exiting anyway
+      } @catch (NSException *exception) {
+        fprintf(stderr, "class-dump: %s\n", exception.reason.UTF8String);
+        return 2;
+      }
     }
 }

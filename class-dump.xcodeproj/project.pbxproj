@@ -346,7 +346,7 @@
 		01EB82D913A591D8003EDE60 /* CDLoadCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDLoadCommand.h; path = Source/CDLoadCommand.h; sourceTree = SOURCE_ROOT; };
 		01EB82DA13A591D8003EDE60 /* CDLoadCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDLoadCommand.m; path = Source/CDLoadCommand.m; sourceTree = SOURCE_ROOT; };
 		01EB82DB13A591D8003EDE60 /* CDMachOFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDMachOFile.h; path = Source/CDMachOFile.h; sourceTree = SOURCE_ROOT; };
-		01EB82DC13A591D8003EDE60 /* CDMachOFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDMachOFile.m; path = Source/CDMachOFile.m; sourceTree = SOURCE_ROOT; };
+		01EB82DC13A591D8003EDE60 /* CDMachOFile.m */ = {isa = PBXFileReference; fileEncoding = 4; explicitFileType = sourcecode.cpp.objcpp; name = CDMachOFile.m; path = Source/CDMachOFile.m; sourceTree = SOURCE_ROOT; };
 		01EB82DD13A591D8003EDE60 /* CDMachOFileDataCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDMachOFileDataCursor.h; path = Source/CDMachOFileDataCursor.h; sourceTree = SOURCE_ROOT; };
 		01EB82DE13A591D8003EDE60 /* CDMachOFileDataCursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDMachOFileDataCursor.m; path = Source/CDMachOFileDataCursor.m; sourceTree = SOURCE_ROOT; };
 		01EB82DF13A591D8003EDE60 /* CDMethodType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDMethodType.h; path = Source/CDMethodType.h; sourceTree = SOURCE_ROOT; };
@@ -1153,6 +1153,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "deprotect-Prefix.pch";
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 				);
@@ -1167,6 +1168,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "deprotect-Prefix.pch";
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 				);
@@ -1218,8 +1220,9 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "UnitTests/UnitTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 				);
@@ -1247,8 +1250,9 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "UnitTests/UnitTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 					"-sectcreate",
@@ -1268,6 +1272,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "formatType-Prefix.pch";
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 				);
@@ -1282,6 +1287,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "formatType-Prefix.pch";
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 				);
@@ -1338,9 +1344,12 @@
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				OTHER_LDFLAGS = ("$(inherited)", "-lc++");
 				WARNING_CFLAGS = (
 					"-fdiagnostics-show-option",
 					"-Wno-semicolon-before-method-body",
@@ -1381,8 +1390,11 @@
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				SDKROOT = macosx;
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				OTHER_LDFLAGS = ("$(inherited)", "-lc++");
 				WARNING_CFLAGS = (
 					"-fdiagnostics-show-option",
 					"-Wno-semicolon-before-method-body",
@@ -1403,6 +1415,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "class-dump-Prefix.pch";
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 				);
@@ -1417,6 +1430,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "class-dump-Prefix.pch";
 				OTHER_LDFLAGS = (
+					"$(inherited)",
 					"-all_load",
 					"-ObjC",
 					"-sectcreate",

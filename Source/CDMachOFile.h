@@ -13,7 +13,7 @@ typedef enum : NSUInteger {
     CDByteOrder_BigEndian = 1,
 } CDByteOrder;
 
-@class CDLCSegment;
+@class CDLCSegment, CDSection;
 @class CDLCDyldInfo, CDLCDylib, CDMachOFile, CDLCSymbolTable, CDLCDynamicSymbolTable, CDLCVersionMinimum, CDLCSourceVersion;
 
 @interface CDMachOFile : CDFile
@@ -51,6 +51,8 @@ typedef enum : NSUInteger {
 - (NSString *)filetypeDescription;
 - (NSString *)flagDescription;
 
+- (BOOL)mdAddressIsFileBacked:(NSUInteger)address;
+- (CDSection *)mdSectionWithName:(NSString *)name;
 - (CDLCSegment *)dataConstSegment;
 - (CDLCSegment *)segmentWithName:(NSString *)segmentName;
 - (CDLCSegment *)segmentContainingAddress:(NSUInteger)address;
